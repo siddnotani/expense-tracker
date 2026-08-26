@@ -38,7 +38,7 @@ class BffHttpSecurityConfiguration {
                         .ignoringRequestMatchers("/api/auth/login", "/api/auth/register"))
                 .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/actuator/**")
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/actuator/**", "/error")
                         .permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
