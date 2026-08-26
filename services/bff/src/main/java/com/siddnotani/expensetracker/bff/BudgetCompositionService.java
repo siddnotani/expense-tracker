@@ -68,7 +68,7 @@ public class BudgetCompositionService {
         LocalDate last = period.atEndOfMonth();
         return Mono.zip(
                         budgetClient.budgets(period.toString()),
-                        budgetClient.categories(false),
+                        budgetClient.categories(true),
                         transactionSummaryClient.summary(first, last))
                 .map(tuple -> new FanOut(tuple.getT1(), tuple.getT2(), tuple.getT3()));
     }

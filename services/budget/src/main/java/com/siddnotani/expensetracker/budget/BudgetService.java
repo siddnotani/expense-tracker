@@ -56,7 +56,7 @@ public class BudgetService {
     @Transactional
     public Category createCategory(BudgetDtos.CreateCategoryRequest request) {
         UUID userId = currentUser.getId();
-        return categoryRepository.save(new Category(userId, request.name().trim(), request.color()));
+        return categoryRepository.saveAndFlush(new Category(userId, request.name().trim(), request.color()));
     }
 
     @Transactional

@@ -25,7 +25,7 @@ class BudgetCompositionServiceTest {
         UUID unbudgeted = UUID.randomUUID();
         when(budgetClient.budgets("2025-01")).thenReturn(Mono.just(List.of(
                 new BffDtos.Budget(UUID.randomUUID(), groceries, "Groceries", 10000))));
-        when(budgetClient.categories(false)).thenReturn(Mono.just(List.of(
+        when(budgetClient.categories(true)).thenReturn(Mono.just(List.of(
                 new BffDtos.Category(groceries, "Groceries", null, false),
                 new BffDtos.Category(unbudgeted, "Travel", null, false))));
         when(summaryClient.summary(
