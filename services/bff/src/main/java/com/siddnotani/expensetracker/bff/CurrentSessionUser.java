@@ -1,4 +1,4 @@
-package com.siddnotani.expensetracker.bff.api;
+package com.siddnotani.expensetracker.bff;
 
 import java.util.UUID;
 

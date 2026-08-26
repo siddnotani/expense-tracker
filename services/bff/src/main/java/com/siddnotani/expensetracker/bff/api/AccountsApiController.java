@@ -1,5 +1,6 @@
 package com.siddnotani.expensetracker.bff.api;
 
+import com.siddnotani.expensetracker.bff.CurrentSessionUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

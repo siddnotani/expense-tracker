@@ -122,6 +122,54 @@ export type TransactionSummary = {
   byCategory: { categoryId: string | null; totalMinor: number }[];
 };
 
+export type Category = {
+  id: string;
+  name: string;
+  color: string | null;
+  archived: boolean;
+};
+
+export type Budget = {
+  id: string;
+  categoryId: string;
+  categoryName: string;
+  amountMinor: number;
+};
+
+export type ProgressCategory = {
+  categoryId: string | null;
+  categoryName: string;
+  budgetedMinor: number;
+  spentMinor: number;
+  remainingMinor: number;
+  overBudget: boolean;
+};
+
+export type BudgetProgress = {
+  period: string;
+  totalBudgetedMinor: number;
+  totalSpentMinor: number;
+  remainingMinor: number;
+  categories: ProgressCategory[];
+};
+
+export type Dashboard = {
+  totalSpentMinor: number;
+  totalIncomeMinor: number;
+  netMinor: number;
+  topCategories: { categoryId: string | null; categoryName: string; spentMinor: number }[];
+  budgetProgress: BudgetProgress;
+};
+
+export type CreateCategoryRequest = { name: string; color?: string };
+export type UpdateCategoryRequest = { name?: string; color?: string; archived?: boolean };
+export type UpsertBudgetRequest = {
+  categoryId: string;
+  period: string;
+  amountMinor: number;
+};
+export type CopyBudgetsRequest = { fromPeriod: string; toPeriod: string };
+
 export const queryKeys = {
   accounts: (includeArchived: boolean) => ['accounts', { includeArchived }] as const,
   transactions: (filters: TransactionFilters) => ['transactions', filters] as const,
@@ -129,24 +177,23 @@ export const queryKeys = {
     ['transactionSummary', range] as const,
 };
 
+function required<T>(result: T | null): T {
+  if (result === null) {
+    throw new Error('Expected a response body');
+  }
+  return result;
+}
+
 export function listAccounts(includeArchived: boolean): Promise<Account[]> {
-  return api<Account[]>(`/api/accounts?includeArchived=${String(includeArchived)}`) as Promise<
-    Account[]
-  >;
+  return api<Account[]>(`/api/accounts?includeArchived=${String(includeArchived)}`).then(required);
 }
 
 export function createAccount(input: AccountInput): Promise<Account> {
-  return api<Account>('/api/accounts', {
-    method: 'POST',
-    body: input,
-  }) as Promise<Account>;
+  return api<Account>('/api/accounts', { method: 'POST', body: input }).then(required);
 }
 
 export function updateAccount(id: string, patch: AccountPatch): Promise<Account> {
-  return api<Account>(`/api/accounts/${id}`, {
-    method: 'PATCH',
-    body: patch,
-  }) as Promise<Account>;
+  return api<Account>(`/api/accounts/${id}`, { method: 'PATCH', body: patch }).then(required);
 }
 
 export function listTransactions(filters: TransactionFilters): Promise<TransactionPage> {
@@ -156,21 +203,15 @@ export function listTransactions(filters: TransactionFilters): Promise<Transacti
       params.set(key, String(value));
     }
   });
-  return api<TransactionPage>(`/api/transactions?${params.toString()}`) as Promise<TransactionPage>;
+  return api<TransactionPage>(`/api/transactions?${params.toString()}`).then(required);
 }
 
 export function createTransaction(input: TransactionInput): Promise<Transaction> {
-  return api<Transaction>('/api/transactions', {
-    method: 'POST',
-    body: input,
-  }) as Promise<Transaction>;
+  return api<Transaction>('/api/transactions', { method: 'POST', body: input }).then(required);
 }
 
 export function updateTransaction(id: string, input: TransactionInput): Promise<Transaction> {
-  return api<Transaction>(`/api/transactions/${id}`, {
-    method: 'PUT',
-    body: input,
-  }) as Promise<Transaction>;
+  return api<Transaction>(`/api/transactions/${id}`, { method: 'PUT', body: input }).then(required);
 }
 
 export function deleteTransaction(id: string): Promise<void> {
@@ -184,7 +225,61 @@ export function getTransactionSummary(range: {
   const params = new URLSearchParams();
   if (range.from) params.set('from', range.from);
   if (range.to) params.set('to', range.to);
-  return api<TransactionSummary>(
-    `/api/transactions/summary?${params.toString()}`,
-  ) as Promise<TransactionSummary>;
+  return api<TransactionSummary>(`/api/transactions/summary?${params.toString()}`).then(required);
+}
+
+export function currentMonth(): string {
+  return formatMonth(new Date());
+}
+
+export function formatMonth(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+export function listCategories(includeArchived = false): Promise<Category[]> {
+  return api<Category[]>(`/api/categories?includeArchived=${String(includeArchived)}`).then(
+    required,
+  );
+}
+
+export function createDefaultCategories(): Promise<Category[]> {
+  return api<Category[]>('/api/categories/defaults', { method: 'POST' }).then(required);
+}
+
+export function createCategory(input: CreateCategoryRequest): Promise<Category> {
+  return api<Category>('/api/categories', { method: 'POST', body: input }).then(required);
+}
+
+export function updateCategory(id: string, input: UpdateCategoryRequest): Promise<Category> {
+  return api<Category>(`/api/categories/${id}`, { method: 'PATCH', body: input }).then(required);
+}
+
+export function archiveCategory(id: string): Promise<void> {
+  return api<void>(`/api/categories/${id}`, { method: 'DELETE' }).then(() => undefined);
+}
+
+export function listBudgets(period: string): Promise<Budget[]> {
+  return api<Budget[]>(`/api/budgets?period=${encodeURIComponent(period)}`).then(required);
+}
+
+export function upsertBudget(input: UpsertBudgetRequest): Promise<Budget> {
+  return api<Budget>('/api/budgets', { method: 'PUT', body: input }).then(required);
+}
+
+export function deleteBudget(id: string): Promise<void> {
+  return api<void>(`/api/budgets/${id}`, { method: 'DELETE' }).then(() => undefined);
+}
+
+export function copyBudgets(input: CopyBudgetsRequest): Promise<void> {
+  return api<void>('/api/budgets/copy', { method: 'POST', body: input }).then(() => undefined);
+}
+
+export function getBudgetProgress(period: string): Promise<BudgetProgress> {
+  return api<BudgetProgress>(`/api/budgets/progress?period=${encodeURIComponent(period)}`).then(
+    required,
+  );
+}
+
+export function getDashboard(period: string): Promise<Dashboard> {
+  return api<Dashboard>(`/api/dashboard?period=${encodeURIComponent(period)}`).then(required);
 }

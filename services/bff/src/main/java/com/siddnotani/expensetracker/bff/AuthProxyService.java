@@ -11,16 +11,16 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 @Service
-class AuthProxyService {
+public class AuthProxyService {
     private final WebClient authWebClient;
     private final ObjectMapper objectMapper;
 
-    AuthProxyService(WebClient authWebClient, ObjectMapper objectMapper) {
+    public AuthProxyService(WebClient authWebClient, ObjectMapper objectMapper) {
         this.authWebClient = authWebClient;
         this.objectMapper = objectMapper;
     }
 
-    UserResponse register(RegisterRequest request) {
+    public UserResponse register(RegisterRequest request) {
         try {
             return authWebClient.post()
                     .uri("/internal/users")
@@ -33,7 +33,7 @@ class AuthProxyService {
         }
     }
 
-    UserResponse authenticate(LoginRequest request) {
+    public UserResponse authenticate(LoginRequest request) {
         try {
             return authWebClient.post()
                     .uri("/internal/users/authenticate")
@@ -50,7 +50,7 @@ class AuthProxyService {
         }
     }
 
-    UserResponse get(UUID id) {
+    public UserResponse get(UUID id) {
         return authWebClient.get()
                 .uri("/internal/users/{id}", id)
                 .retrieve()
@@ -71,12 +71,12 @@ class AuthProxyService {
         return new ResponseStatusException(exception.getStatusCode(), detail);
     }
 
-    record RegisterRequest(String email, String password, String displayName) {
+    public record RegisterRequest(String email, String password, String displayName) {
     }
 
-    record LoginRequest(String email, String password) {
+    public record LoginRequest(String email, String password) {
     }
 
-    record UserResponse(UUID id, String email, String displayName) {
+    public record UserResponse(UUID id, String email, String displayName) {
     }
 }

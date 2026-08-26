@@ -12,11 +12,11 @@ public class BalanceSyncException extends RuntimeException {
         this.accountId = accountId;
     }
 
-    UUID getTransactionId() {
+    public UUID getTransactionId() {
         return transactionId;
     }
 
-    UUID getAccountId() {
+    public UUID getAccountId() {
         return accountId;
     }
 }

@@ -72,12 +72,25 @@ class SessionAuthController {
     @GetMapping("/me")
     UserResponse me(HttpServletRequest request) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new IllegalStateException("no authenticated user");
+        }
         UUID id = UUID.fromString(authentication.getName());
         HttpSession session = request.getSession(false);
-        return new UserResponse(
-                id,
-                (String) session.getAttribute(EMAIL_ATTRIBUTE),
-                (String) session.getAttribute(DISPLAY_NAME_ATTRIBUTE));
+        String email = session == null ? null : (String) session.getAttribute(EMAIL_ATTRIBUTE);
+        String displayName =
+                session == null ? null : (String) session.getAttribute(DISPLAY_NAME_ATTRIBUTE);
+        if (email == null || displayName == null) {
+            AuthProxyService.UserResponse user = authProxyService.get(id);
+            if (user == null) {
+                throw new IllegalStateException("authenticated user not found");
+            }
+            HttpSession restoredSession = request.getSession(true);
+            restoredSession.setAttribute(EMAIL_ATTRIBUTE, user.email());
+            restoredSession.setAttribute(DISPLAY_NAME_ATTRIBUTE, user.displayName());
+            return UserResponse.from(user);
+        }
+        return new UserResponse(id, email, displayName);
     }
 
     private void establishSession(

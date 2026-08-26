@@ -8,12 +8,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +25,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import java.net.http.HttpClient;
+import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -41,6 +44,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BffApiWireMockTest {
@@ -59,6 +64,12 @@ class BffApiWireMockTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @MockBean
+    private com.siddnotani.expensetracker.bff.AuthProxyService authProxyService;
+
+    private String cookieHeader;
+    private String csrfToken;
 
     @LocalServerPort
     private int port;
@@ -93,6 +104,25 @@ class BffApiWireMockTest {
         transactions.resetAll();
         restTemplate.getRestTemplate().setRequestFactory(
                 new JdkClientHttpRequestFactory(HttpClient.newHttpClient()));
+        when(authProxyService.authenticate(any())).thenReturn(
+                new com.siddnotani.expensetracker.bff.AuthProxyService.UserResponse(
+                        USER_ID, "test@example.com", "Test User"));
+        ResponseEntity<Void> login = restTemplate.postForEntity(
+                "http://localhost:" + port + "/api/auth/login",
+                new com.siddnotani.expensetracker.bff.AuthProxyService.LoginRequest(
+                        "test@example.com", "password"),
+                Void.class);
+        List<String> cookies = login.getHeaders().get(HttpHeaders.SET_COOKIE);
+        cookieHeader = cookies.stream()
+                .map(cookie -> cookie.substring(0, cookie.indexOf(';')))
+                .reduce((left, right) -> left + "; " + right)
+                .orElseThrow();
+        csrfToken = cookies.stream()
+                .map(cookie -> cookie.substring(0, cookie.indexOf(';')))
+                .filter(cookie -> cookie.startsWith("XSRF-TOKEN="))
+                .map(cookie -> cookie.substring("XSRF-TOKEN=".length()))
+                .findFirst()
+                .orElseThrow();
     }
 
     @Test
@@ -327,7 +357,8 @@ class BffApiWireMockTest {
             ParameterizedTypeReference<T> responseType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("X-User-Id", USER_ID.toString());
+        headers.set(HttpHeaders.COOKIE, cookieHeader);
+        headers.set("X-XSRF-TOKEN", csrfToken);
         return restTemplate.exchange(
                 "http://localhost:" + port + path,
                 method,
