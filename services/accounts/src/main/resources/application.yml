@@ -1,0 +1,32 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: accounts-service
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/expense_tracker}
+    username: ${SPRING_DATASOURCE_USERNAME:expense}
+    password: ${SPRING_DATASOURCE_PASSWORD:expense}
+  jpa:
+    open-in-view: false
+  flyway:
+    schemas: accounts
+    default-schema: accounts
+    create-schemas: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+internal:
+  jwt:
+    secret: ${INTERNAL_JWT_SECRET:local-development-secret-change-me-32chars}
+logging:
+  pattern:
+    console: '{"timestamp":"%d{ISO8601}","level":"%level","logger":"%logger{36}","requestId":"%X{requestId}","message":"%msg"}%n'

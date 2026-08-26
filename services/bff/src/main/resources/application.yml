@@ -1,0 +1,18 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: bff
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+downstream:
+  auth-url: ${AUTH_SERVICE_URL:http://localhost:8081}
+  accounts-url: ${ACCOUNTS_SERVICE_URL:http://localhost:8082}
+  transaction-url: ${TRANSACTION_SERVICE_URL:http://localhost:8083}
+  budget-url: ${BUDGET_SERVICE_URL:http://localhost:8084}
+logging:
+  pattern:
+    console: '{{"timestamp":"%d{{ISO8601}}","level":"%level","logger":"%logger{{36}}","requestId":"%X{{requestId}}","message":"%msg"}}%n'
