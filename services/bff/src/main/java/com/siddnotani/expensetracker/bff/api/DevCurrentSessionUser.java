@@ -7,11 +7,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.UUID;
 
 /**
- * TEMPORARY-SEAM: join this implementation to the sibling auth/session PR.
+ * TEMPORARY-SEAM: resolves the caller from the {@code X-User-Id} header, falling back to a fixed
+ * development user, so the API can be exercised before the session cookie exists.
  *
- * <p>It supports local curl verification until the real session filter is available.</p>
+ * <p>The sibling auth/session PR owns the real implementation of {@link CurrentSessionUser}, which
+ * reads the authenticated principal from the security context. Delete this class when that PR is
+ * joined to this one.
  */
-// TEMPORARY-SEAM: replace with the implementation from the sibling auth/session PR.
 @Component
 public class DevCurrentSessionUser implements CurrentSessionUser {
     public static final UUID DEV_USER_ID =
@@ -19,11 +21,6 @@ public class DevCurrentSessionUser implements CurrentSessionUser {
 
     @Override
     public UUID getId() {
-        UUID principalId = authenticatedPrincipalId();
-        if (principalId != null) {
-            return principalId;
-        }
-
         ServletRequestAttributes attributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
@@ -35,28 +32,10 @@ public class DevCurrentSessionUser implements CurrentSessionUser {
         return DEV_USER_ID;
     }
 
-    private UUID authenticatedPrincipalId() {
-        try {
-            Class<?> holder = Class.forName(
-                    "org.springframework.security.core.context.SecurityContextHolder");
-            Object context = holder.getMethod("getContext").invoke(null);
-            Object authentication = context.getClass().getMethod("getAuthentication").invoke(context);
-            if (authentication == null
-                    || !(Boolean) authentication.getClass().getMethod("isAuthenticated")
-                            .invoke(authentication)) {
-                return null;
-            }
-            Object principal = authentication.getClass().getMethod("getPrincipal").invoke(authentication);
-            if (principal == null || "anonymousUser".equals(principal)) {
-                return null;
-            }
-            return parse(principal.toString());
-        } catch (ReflectiveOperationException | LinkageError exception) {
+    private UUID parse(String value) {
+        if (value == null) {
             return null;
         }
-    }
-
-    private UUID parse(String value) {
         try {
             return UUID.fromString(value);
         } catch (IllegalArgumentException exception) {
