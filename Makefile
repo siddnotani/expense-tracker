@@ -9,4 +9,4 @@ build:
 test:
 	mvn -B -T1C test
 lint:
-	cd web && npm ci && npm run lint
+	cd web && npm ci && npm run format:check && npm run lint

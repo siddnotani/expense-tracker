@@ -9,5 +9,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @Import({InternalJwtSecurityConfiguration.class, SharedWebConfiguration.class})
 public class BudgetApplication {
-    public static void main(String[] args) { SpringApplication.run(BudgetApplication.class, args); }
+    public static void main(String[] args) {
+        SpringApplication.run(BudgetApplication.class, args);
+    }
 }

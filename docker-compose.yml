@@ -49,6 +49,7 @@ services:
       ACCOUNTS_SERVICE_URL: http://accounts:8082
       TRANSACTION_SERVICE_URL: http://transaction:8083
       BUDGET_SERVICE_URL: http://budget:8084
+      INTERNAL_JWT_SECRET: local-development-secret-change-me-32chars
     depends_on:
       auth: { condition: service_healthy }
       accounts: { condition: service_healthy }

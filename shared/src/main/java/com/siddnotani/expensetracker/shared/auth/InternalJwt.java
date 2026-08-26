@@ -20,15 +20,19 @@ public class InternalJwt {
 
     public InternalJwt(@Value("${internal.jwt.secret}") String secret) {
         if (secret == null || secret.length() < 32) {
-            throw new IllegalArgumentException("internal.jwt.secret must contain at least 32 characters");
+            throw new IllegalArgumentException(
+                    "internal.jwt.secret must contain at least 32 characters");
         }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String sign(UUID userId) {
         Instant now = Instant.now();
-        return Jwts.builder().subject(userId.toString()).expiration(Date.from(now.plus(TTL)))
-                .signWith(key).compact();
+        return Jwts.builder()
+                .subject(userId.toString())
+                .expiration(Date.from(now.plus(TTL)))
+                .signWith(key)
+                .compact();
     }
 
     public UUID verify(String token) {

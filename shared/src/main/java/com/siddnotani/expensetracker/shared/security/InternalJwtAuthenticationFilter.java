@@ -11,23 +11,35 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 public class InternalJwtAuthenticationFilter extends OncePerRequestFilter {
     private final InternalJwt internalJwt;
 
-    public InternalJwtAuthenticationFilter(InternalJwt internalJwt) { this.internalJwt = internalJwt; }
+    public InternalJwtAuthenticationFilter(InternalJwt internalJwt) {
+        this.internalJwt = internalJwt;
+    }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) { return request.getRequestURI().startsWith("/actuator/"); }
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getRequestURI().startsWith("/actuator/");
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null || !header.startsWith("Bearer ")) { chain.doFilter(request, response); return; }
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         try {
             UUID userId = internalJwt.verify(header.substring(7));
-            var authentication = new UsernamePasswordAuthenticationToken(userId.toString(), null, java.util.List.of());
+            var authentication = new UsernamePasswordAuthenticationToken(
+                    userId.toString(), null, List.of());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
         } catch (RuntimeException ex) {
