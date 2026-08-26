@@ -56,7 +56,7 @@ class TransactionSummaryQueryTest {
         assertEquals(250, summary.totalIncomeMinor());
         assertEquals(120, summary.netMinor());
         assertEquals(2, summary.byCategory().size());
-        assertEquals(-150, summary.byCategory().stream()
+        assertEquals(100, summary.byCategory().stream()
                 .filter(value -> category.equals(value.categoryId())).findFirst().orElseThrow()
                 .totalMinor());
         assertEquals(30, summary.byCategory().stream()

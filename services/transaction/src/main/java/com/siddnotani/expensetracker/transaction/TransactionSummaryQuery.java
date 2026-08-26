@@ -34,10 +34,9 @@ public class TransactionSummaryQuery {
 
         String categorySql = """
                 SELECT category_id,
-                       COALESCE(SUM(CASE WHEN direction = 'EXPENSE'
-                           THEN amount_minor ELSE -amount_minor END), 0) AS total_minor
+                       COALESCE(SUM(amount_minor), 0) AS total_minor
                 FROM txn.transactions
-                WHERE user_id = ?%s
+                WHERE user_id = ? AND direction = 'EXPENSE'%s
                 GROUP BY category_id
                 ORDER BY total_minor DESC
                 """.formatted(dateWhere);
