@@ -59,6 +59,8 @@ services:
   web:
     build: ./web
     ports: ["5173:5173"]
+    environment:
+      VITE_API_PROXY_TARGET: http://bff:8080
     volumes:
       - ./web:/app
       - /app/node_modules
