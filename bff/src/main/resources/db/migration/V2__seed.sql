@@ -1,0 +1,60 @@
+INSERT INTO categories (name, display_name) VALUES
+    ('FOOD', 'Food'),
+    ('TRANSPORT', 'Transport'),
+    ('HOUSING', 'Housing'),
+    ('UTILITIES', 'Utilities'),
+    ('ENTERTAINMENT', 'Entertainment'),
+    ('HEALTH', 'Health'),
+    ('SHOPPING', 'Shopping'),
+    ('OTHER', 'Other');
+
+INSERT INTO expenses (amount, category_id, description, date) VALUES
+    -- April 2026
+    (1450.00, (SELECT id FROM categories WHERE name = 'HOUSING'),       'April rent',                    DATE '2026-04-01'),
+    (86.40,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Weekly groceries',              DATE '2026-04-03'),
+    (42.15,   (SELECT id FROM categories WHERE name = 'TRANSPORT'),     'Fuel',                          DATE '2026-04-06'),
+    (118.90,  (SELECT id FROM categories WHERE name = 'UTILITIES'),     'Electricity bill',              DATE '2026-04-10'),
+    (15.99,   (SELECT id FROM categories WHERE name = 'ENTERTAINMENT'), 'Streaming subscription',        DATE '2026-04-12'),
+    (64.00,   (SELECT id FROM categories WHERE name = 'HEALTH'),        'Pharmacy',                      DATE '2026-04-18'),
+    (139.99,  (SELECT id FROM categories WHERE name = 'SHOPPING'),      'Running shoes',                 DATE '2026-04-22'),
+    (-- May 2026
+     1450.00, (SELECT id FROM categories WHERE name = 'HOUSING'),       'May rent',                      DATE '2026-05-01'),
+    (92.75,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Weekly groceries',              DATE '2026-05-04'),
+    (38.50,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Dinner with friends',           DATE '2026-05-09'),
+    (60.00,   (SELECT id FROM categories WHERE name = 'TRANSPORT'),     'Monthly transit pass',          DATE '2026-05-05'),
+    (74.30,   (SELECT id FROM categories WHERE name = 'UTILITIES'),     'Internet',                      DATE '2026-05-11'),
+    (54.00,   (SELECT id FROM categories WHERE name = 'ENTERTAINMENT'), 'Concert tickets',               DATE '2026-05-17'),
+    (25.00,   (SELECT id FROM categories WHERE name = 'OTHER'),         'Birthday gift',                 DATE '2026-05-23'),
+    (-- June 2026
+     1450.00, (SELECT id FROM categories WHERE name = 'HOUSING'),       'June rent',                     DATE '2026-06-01'),
+    (101.20,  (SELECT id FROM categories WHERE name = 'FOOD'),          'Weekly groceries',              DATE '2026-06-02'),
+    (12.50,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Lunch',                         DATE '2026-06-08'),
+    (45.80,   (SELECT id FROM categories WHERE name = 'TRANSPORT'),     'Fuel',                          DATE '2026-06-10'),
+    (132.45,  (SELECT id FROM categories WHERE name = 'UTILITIES'),     'Electricity bill',              DATE '2026-06-12'),
+    (210.00,  (SELECT id FROM categories WHERE name = 'HEALTH'),        'Dentist visit',                 DATE '2026-06-15'),
+    (79.99,   (SELECT id FROM categories WHERE name = 'SHOPPING'),      'Summer clothes',                DATE '2026-06-20'),
+    (15.99,   (SELECT id FROM categories WHERE name = 'ENTERTAINMENT'), 'Streaming subscription',        DATE '2026-06-12'),
+    (-- July 2026
+     1450.00, (SELECT id FROM categories WHERE name = 'HOUSING'),       'July rent',                     DATE '2026-07-01'),
+    (88.60,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Weekly groceries',              DATE '2026-07-06'),
+    (60.00,   (SELECT id FROM categories WHERE name = 'TRANSPORT'),     'Monthly transit pass',          DATE '2026-07-03'),
+    (420.00,  (SELECT id FROM categories WHERE name = 'TRANSPORT'),     'Train tickets for holiday',     DATE '2026-07-14'),
+    (74.30,   (SELECT id FROM categories WHERE name = 'UTILITIES'),     'Internet',                      DATE '2026-07-11'),
+    (36.00,   (SELECT id FROM categories WHERE name = 'ENTERTAINMENT'), 'Cinema',                        DATE '2026-07-19'),
+    (49.90,   (SELECT id FROM categories WHERE name = 'SHOPPING'),      'Kitchen gadgets',               DATE '2026-07-25'),
+    (-- August 2026
+     1450.00, (SELECT id FROM categories WHERE name = 'HOUSING'),       'August rent',                   DATE '2026-08-01'),
+    (95.10,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Weekly groceries',              DATE '2026-08-04'),
+    (27.80,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Takeaway pizza',                DATE '2026-08-15'),
+    (40.25,   (SELECT id FROM categories WHERE name = 'TRANSPORT'),     'Fuel',                          DATE '2026-08-09'),
+    (125.60,  (SELECT id FROM categories WHERE name = 'UTILITIES'),     'Electricity bill',              DATE '2026-08-12'),
+    (32.00,   (SELECT id FROM categories WHERE name = 'HEALTH'),        'Gym membership',                DATE '2026-08-05'),
+    (2.50,    (SELECT id FROM categories WHERE name = 'OTHER'),         'Parking meter',                 DATE '2026-08-21'),
+    (-- September 2026
+     1450.00, (SELECT id FROM categories WHERE name = 'HOUSING'),       'September rent',                DATE '2026-09-01'),
+    (83.95,   (SELECT id FROM categories WHERE name = 'FOOD'),          'Weekly groceries',              DATE '2026-09-07'),
+    (60.00,   (SELECT id FROM categories WHERE name = 'TRANSPORT'),     'Monthly transit pass',          DATE '2026-09-02'),
+    (74.30,   (SELECT id FROM categories WHERE name = 'UTILITIES'),     'Internet',                      DATE '2026-09-11'),
+    (15.99,   (SELECT id FROM categories WHERE name = 'ENTERTAINMENT'), 'Streaming subscription',        DATE '2026-09-12'),
+    (189.00,  (SELECT id FROM categories WHERE name = 'SHOPPING'),      'Headphones',                    DATE '2026-09-18'),
+    (32.00,   (SELECT id FROM categories WHERE name = 'HEALTH'),        'Gym membership',                DATE '2026-09-05');
