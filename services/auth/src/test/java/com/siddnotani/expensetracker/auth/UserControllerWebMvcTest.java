@@ -103,6 +103,18 @@ class UserControllerWebMvcTest {
     }
 
     @Test
+    void passwordOverBcryptLimitReturnsBadRequest() throws Exception {
+        for (String password : new String[] {"a".repeat(73), "é".repeat(37)}) {
+            mockMvc.perform(post("/internal/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(
+                                    new CreateUserRequest("alice@example.com", password, "Alice"))))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(org.hamcrest.Matchers.containsString("at most 72 bytes")));
+        }
+    }
+
+    @Test
     void unknownUserReturnsNotFound() throws Exception {
         when(userService.get(any())).thenThrow(new NotFoundException("User not found"));
 
